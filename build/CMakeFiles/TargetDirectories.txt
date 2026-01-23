@@ -1,3 +1,0 @@
-/home/fran/Geant4/simulazioni/B4c/build/CMakeFiles/exampleB4c.dir
-/home/fran/Geant4/simulazioni/B4c/build/CMakeFiles/edit_cache.dir
-/home/fran/Geant4/simulazioni/B4c/build/CMakeFiles/rebuild_cache.dir
