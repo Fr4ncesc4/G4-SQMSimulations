@@ -1,45 +1,26 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
 /// \file CalorimeterSD.cc
 /// \brief Implementation of the B4c::CalorimeterSD class
 
 #include "CalorimeterSD.hh"
-
 #include "G4HCofThisEvent.hh"
 #include "G4SDManager.hh"
 #include "G4Step.hh"
+#include "G4ThreeVector.hh"
+#include "G4ios.hh" 
+#include "G4Track.hh"
+#include "G4VPhysicalVolume.hh"
+#include "G4StepPoint.hh"
 
 namespace B4c
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-CalorimeterSD::CalorimeterSD(const G4String& name, const G4String& hitsCollectionName,
+CalorimeterSD::CalorimeterSD(const G4String& name, 
+                             const G4String& hitsCollectionName,
                              G4int nofCells)
-  : G4VSensitiveDetector(name), fNofCells(nofCells)
+  : G4VSensitiveDetector(name), 
+  fNofCells(nofCells)
 {
   collectionName.insert(hitsCollectionName);
 }
@@ -50,10 +31,11 @@ void CalorimeterSD::Initialize(G4HCofThisEvent* hce)
 {
   // Create hits collection
   fHitsCollection = new CalorHitsCollection(SensitiveDetectorName, collectionName[0]);
-
+  G4int hcID = GetCollectionID(0);
   // Add this collection in hce
-  auto hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+  // auto hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
   hce->AddHitsCollection(hcID, fHitsCollection);
+  
 
   // Create hits
   // fNofCells for cells + one more for total sums
@@ -68,6 +50,8 @@ G4bool CalorimeterSD::ProcessHits(G4Step* step, G4TouchableHistory*)
 {
   // energy deposit
   auto edep = step->GetTotalEnergyDeposit();
+   auto pid = step->GetTrack()->GetDefinition()->GetParticleName();
+ 
 
   // step length
   G4double stepLength = 0.;
@@ -75,7 +59,9 @@ G4bool CalorimeterSD::ProcessHits(G4Step* step, G4TouchableHistory*)
     stepLength = step->GetStepLength();
   }
 
-  if (edep == 0. && stepLength == 0.) return false;
+  if (edep == 0. && stepLength == 0. && pid != "opticalphoton")
+    return false;
+  
 
   auto touchable = (step->GetPreStepPoint()->GetTouchable());
 
@@ -97,8 +83,38 @@ G4bool CalorimeterSD::ProcessHits(G4Step* step, G4TouchableHistory*)
   hit->Add(edep, stepLength);
   hitTotal->Add(edep, stepLength);
 
-  return true;
+   
+    
+
+  /*  if (pid == "opticalphoton" &&
+    step->GetPostStepPoint()->GetPhysicalVolume() &&
+    step->GetPostStepPoint()->GetPhysicalVolume()->GetName() == "SiPM")
+{
+    G4double photE    = step->GetPostStepPoint()->GetKineticEnergy();
+    G4double photTime = step->GetPostStepPoint()->GetGlobalTime();
+
+    hitTotal->AddPhoton(photE, photTime);
+
+    // fermiamo il fotone per evitare doppi conteggi
+    Kill(step);
+}*/ 
+
+if (pid == "opticalphoton" &&
+    step->GetPreStepPoint()->GetStepStatus() == fGeomBoundary)
+{
+    G4double photE    = step->GetPreStepPoint()->GetKineticEnergy();
+    G4double photTime = step->GetPreStepPoint()->GetGlobalTime();
+
+    hitTotal->AddPhoton(photE, photTime);
+    Kill(step);
 }
+    
+
+  return true;
+
+}
+
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -114,5 +130,43 @@ void CalorimeterSD::EndOfEvent(G4HCofThisEvent*)
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+
+
+
+void CalorimeterSD::TellVolume(const G4Step* aStep)
+{
+    if (!aStep->GetPreStepPoint()->GetPhysicalVolume() ||
+        !aStep->GetPostStepPoint()->GetPhysicalVolume())
+        return;
+
+    G4cout << "PreStep: "
+           << aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName()
+           << " *** PostStep: "
+           << aStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()
+           << G4endl;
+}
+
+
+void CalorimeterSD::Kill(G4Step* step)
+{
+    step->GetTrack()->SetTrackStatus(fStopAndKill);
+}
+
+G4bool CalorimeterSD::Mcross(const G4Step* aStep,
+                             const G4String& vol1_name,
+                             const G4String& vol2_name)
+{
+    if (!aStep->GetPreStepPoint()->GetPhysicalVolume() ||
+        !aStep->GetPostStepPoint()->GetPhysicalVolume())
+        return false;
+
+    auto preName  = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+    auto postName = aStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+
+    return (preName == vol1_name && postName == vol2_name);
+}
+
+
 
 }  // namespace B4c

@@ -53,27 +53,13 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
   fParticleGun = new G4ParticleGun(nofParticles);
   
  
-  // default particle kinematic
-  //
-  //auto particleDefinition = G4ParticleTable::GetParticleTable()->FindParticle("e-");
-  //auto particleDefinition = G4IonTable::GetIonTable()->GetIon(Z, A, E);
+  //default particle kinematic
+
+  auto particleDefinition = G4ParticleTable::GetParticleTable()->FindParticle("mu-");
   
-  //fParticleGun->SetParticleDefinition(particleDefinition);
-  // fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
-  //fParticleGun->SetParticleEnergy(300. * MeV);
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
-  delete fParticleGun;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
-{
+  fParticleGun->SetParticleDefinition(particleDefinition);  
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
+  fParticleGun->SetParticleEnergy(300. * MeV);
   // This function is called at the begining of event
 
   // In order to avoid dependence of PrimaryGeneratorAction
@@ -101,19 +87,33 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   }
 
     // Creazione nucleo esotico
-  G4int Z = 60;      // numero di protoni
-  G4int A = 300;     // numero totale di nucleoni
-  G4double E = 0.0*keV;  // energia di eccitazione nucleare
-  auto particleDefinition = G4IonTable::GetIonTable()->GetIon(Z, A, E);
+  // G4int Z = 60;      // numero di protoni
+  //G4int A = 300;     // numero totale di nucleoni
+  //G4double E = 0.0*keV;  // energia di eccitazione nucleare
+  /*auto particleDefinition = G4IonTable::GetIonTable()->GetIon(Z, A, E);
   fParticleGun->SetParticleDefinition(particleDefinition);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
-  fParticleGun->SetParticleEnergy(90000.*GeV);
+  fParticleGun->SetParticleEnergy(90000.*GeV);*/
 
 
   
   // Set gun position
   fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., -worldZHalfLength));
 
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+PrimaryGeneratorAction::~PrimaryGeneratorAction()
+{
+  delete fParticleGun;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
+{
+  
   fParticleGun->GeneratePrimaryVertex(event);
 }
 

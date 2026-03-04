@@ -36,6 +36,15 @@
 #include "G4UIcommand.hh"
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
+
+
+#include "G4OpticalPhysics.hh"
+#include "G4EmStandardPhysics_option4.hh"
+#include "G4Scintillation.hh"
+#include "G4LossTableManager.hh"
+#include "G4EmSaturation.hh"
+
+
 // #include "Randomize.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -119,6 +128,19 @@ int main(int argc, char** argv)
 
   auto physicsList = new FTFP_BERT;
   runManager->SetUserInitialization(physicsList);
+  
+    G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
+    
+
+      auto opticalParams = G4OpticalParameters::Instance();
+
+      //  opticalParams->SetWLSTimeProfile("delta");
+      opticalParams->SetScintTrackSecondariesFirst(true);
+      opticalParams->SetCerenkovMaxPhotonsPerStep(20);
+      opticalParams->SetCerenkovMaxBetaChange(10.0);
+      opticalParams->SetCerenkovTrackSecondariesFirst(true);
+      
+    physicsList->RegisterPhysics(opticalPhysics);
 
 
   auto actionInitialization = new B4c::ActionInitialization();
