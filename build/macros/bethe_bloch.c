@@ -1,0 +1,240 @@
+#include <vector>
+#include <string>
+#include <iostream>
+#include <cmath>
+#include "TFile.h"
+#include "TH1D.h"
+#include "TGraph.h"
+#include "TCanvas.h"
+
+void bethe_bloch() {
+
+  // INPUT
+  
+  //vettore che contiene files
+  std::vector<std::string> files = {
+    "B4_50.root",
+    "B4_100.root",
+    "B4_200.root",
+    "B4_500.root",
+    "B4_700.root",
+    "B4_1000.root",
+    "B4_2000.root",
+    "B4_4000.root",
+    "B4_6000.root",
+    "B4_8000.root",
+    "B4_10000.root"
+  };
+  //vettore che contiene energie cinetiche
+  std::vector<double> Ekin_MeV = {
+    50, 100, 200, 500, 700, 1000, 2000, 4000, 6000, 8000, 10000.0
+  };
+
+  if (files.size() != Ekin_MeV.size()) {
+    std::cerr << "ERRORE: mismatch tra files ed energie" << std::endl;
+    return;
+  }
+
+  const double mp = 938.272; // MeV (massa del protone)
+  //const double mp = 105.65 ;
+
+  std::vector<double> betaGamma, ErrbetaGamma;
+  std::vector<double> dEdx, ErrdEdx;
+  std::map<int, TH1D*> h_edep;
+
+
+  // OPEN FILE
+
+
+  for (size_t i = 0; i < files.size(); ++i) {
+
+    TFile *f = TFile::Open(files[i].c_str());
+    if (!f || f->IsZombie()) {
+      std::cerr << "Errore apertura file " << files[i] << std::endl;
+      continue;
+    }
+
+  // ACCEDE AI TTREE
+    
+    TTree *tMC = (TTree*)f->Get("B4");
+    if(!tMC) {
+      cerr << "Errore: TTree B4 mancante in " << files[i] << endl;
+      f->Close();
+      continue;
+}
+
+    
+double Edep;
+double Lgt;
+
+ 
+ // SET BRANCH ADDRESS ( associo i rami del ttree alle variabili Edep e Lgt
+
+ 
+tMC->SetBranchAddress("Egap", &Edep);
+tMC->SetBranchAddress("Lgap", &Lgt);
+ tMC->GetEntry(0); // prima entry
+
+
+     
+    
+    /*
+  // ISTOGRAMMI
+
+    TH1D *hEgap = (TH1D*)f->Get("Egap"); // energia depositata nell'assorbitore
+    TH1D *hLgap = (TH1D*)f->Get("Lgap"); // lunghezza di traccia nell'assorbitore
+    int genEnergy = int(Ekin_MeV.at(i));
+    h_edep[genEnergy] = hEgap;
+    h_edep[genEnergy]->SetName(Form("h_edep_%iMeV", genEnergy));
+    h_edep[genEnergy]->SetTitle(Form("Energy %i MeV; Deposited Energy [MeV]; Counts [-]", genEnergy));
+    
+    if (!hEgap || !hLgap) {
+      std::cerr << "Istogrammi Egap/Lgap non trovati in "
+                << files[i] << std::endl;
+      f->Close();
+      continue;
+    }
+    */
+
+ 
+int genEnergy = int(Ekin_MeV.at(i));
+// per ogni file, crea un isto per raccogliere dati su E depositata
+ 
+TH1D *hEgap = new TH1D(
+    Form("h_edep_%iMeV", genEnergy),
+    Form("Energy %iMeV; Deposited Energy [MeV]; Counts [-]", genEnergy),
+    1000, 0, 10
+);
+
+
+TH1D *hLgap = new TH1D(
+    Form("h_len_%iMeV", genEnergy),
+    Form("Tracklenght %iMeV; Track lenght  [mm]; Counts [-]", genEnergy),
+    1000, 0, 10
+); 
+
+
+ 
+
+  // MEDIE
+  
+
+    //double mean_Egap = hEgap->GetMean(); // MeV
+    //double mean_Lgap = hLgap->GetMean(); // mm
+  
+    //GET ENTRY
+// per ogni entry, vengono letti Edep e Lgt e usati per calcolare la media di Egap e Lgap, viene calolata poi dE/dx
+      int N = tMC->GetEntries();
+
+double sumE = 0.0;
+double sumL = 0.0;
+int    nValid = 0;
+
+for(int j = 0; j < N; j++) {
+
+    tMC->GetEntry(j);
+
+    if(Lgt <= 0) continue;
+
+    sumE += Edep;
+    sumL += Lgt;
+    nValid++;
+    hEgap->Fill(Edep);
+    hLgap->Fill(Lgt);
+    }
+
+if(nValid == 0) {
+    cerr << "Nessun evento valido in " << files[i] << endl;
+    f->Close();
+    continue;
+}
+h_edep[genEnergy] = hEgap;
+
+ double mean_Egap = hEgap-> GetMean();//sumE / nValid;  // MeV
+ double mean_Lgap = hLgap-> GetMean() * 0.1;  //sumL / nValid;  // mm
+ double sigma_Egap = hEgap-> GetRMS();
+ double sigma_Lgap = hLgap-> GetRMS()*0.1;
+     
+    if (mean_Lgap <= 0) {
+      std::cerr << "Lunghezza media nulla in "
+                << files[i] << std::endl;
+      f->Close();
+      continue;
+    }
+
+    
+    double mean_dEdx = mean_Egap / (mean_Lgap * 0.1)/1.032; // MeV/cm
+    double error_dEdx = (sigma_Egap/mean_Lgap + mean_Egap / (mean_Lgap * mean_Lgap)*sigma_Lgap)/1.032; // MeV/cm
+    
+    // CINEMATICA RELATIVISTICA, per ogni file
+   
+    double Ekin  = Ekin_MeV[i];
+    double gamma = 1.0 + Ekin / mp;
+    double beta  = std::sqrt(1.0 - 1.0 / (gamma * gamma));
+    //double beta = 0.001;
+
+    betaGamma.push_back(beta * gamma);
+    dEdx.push_back(mean_dEdx);
+    ErrdEdx.push_back(error_dEdx);
+    ErrbetaGamma.push_back(0);
+    std::cout << "File: " << files[i]
+              << "  Ekin=" << Ekin << " MeV"
+              << "  <dE/dx>=" << mean_dEdx << " MeV/cm"
+              << "  beta*gamma=" << beta * gamma
+              << std::endl;
+
+    //f->Close();
+  }
+
+  // PLOT BETHE–BLOCH
+ 
+
+  if (betaGamma.empty()) {
+    std::cerr << "Nessun punto valido per il grafico" << std::endl;
+    return;
+  }
+
+  TCanvas *c = new TCanvas("c", "Bethe-Bloch", 800, 600);
+
+  c->SetLogx();
+
+  TGraphErrors *g = new TGraphErrors(betaGamma.size(),
+				     betaGamma.data(),
+				     dEdx.data(),
+				     ErrbetaGamma.data(),
+				     ErrdEdx.data()
+				     );
+
+  
+  
+  //g->GetXaxis()->SetRangeUser(0, 10);
+  //g->GetXaxis()->SetRangeUser(0.01, 13);
+  cout<< __LINE__<<endl;
+  //g->GetYaxis()->SetRangeUser(0, 50); 
+
+  g->SetTitle("Bethe-Bloch (Geant4);#beta#gamma;<dE/dx> [MeV/cm]");
+  g->SetMarkerStyle(20);
+  g->SetMarkerSize(1.2);
+  g->Draw("AP");
+  
+
+  c->Update();
+  cout<< __LINE__<<endl;
+
+  gStyle->SetOptStat();
+  std::vector<int> colors = {807, 1, 4, 6, 8, 93, 69, 28, 880, 820, 920};
+  int i=0;
+  TLegend *lg = new TLegend(0.7, 0.7, 0.9, 0.9);
+  new TCanvas();
+  for(auto e : h_edep){
+    e.second->SetLineColor(colors.at(i));
+    lg->AddEntry(e.second, Form("Energy = %i MeV", e.first), "l");
+    if(i==0) e.second->Draw();
+    else e.second->Draw("same");
+     cout<< __LINE__<<endl;
+
+    i++;
+  }
+  lg->Draw("same");
+}
+
