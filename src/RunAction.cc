@@ -46,11 +46,7 @@ RunAction::RunAction()
   analysisManager->CreateNtupleDColumn("Eabs");
   analysisManager->CreateNtupleDColumn("Escint");
   analysisManager->CreateNtupleDColumn("Labs");
-<<<<<<< HEAD
   analysisManager->CreateNtupleDColumn("Lscint");
-=======
-  analysisManager->CreateNtupleDColumn("Lgap");
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
   analysisManager->CreateNtupleIColumn("NPhotons");
   analysisManager->CreateNtupleDColumn("t_first_photon");
   analysisManager->FinishNtuple();

@@ -1,11 +1,7 @@
 /// \file CalorimeterSD.cc
 /// \brief Implementation of the B4c::CalorimeterSD class
 
-<<<<<<< HEAD
-//ad ogni step nel rivelatore crea o aggiorna calorhit
 
-=======
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 #include "CalorimeterSD.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4SDManager.hh"
@@ -15,10 +11,7 @@
 #include "G4Track.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4StepPoint.hh"
-<<<<<<< HEAD
 
-=======
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 
 namespace B4c
 {
@@ -123,10 +116,6 @@ if (pid == "opticalphoton" &&
 
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

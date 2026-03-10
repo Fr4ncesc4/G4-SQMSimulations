@@ -38,11 +38,9 @@ class EventAction : public G4UserEventAction
 
     // data members
     G4int fAbsHCID = -1;
-<<<<<<< HEAD
+
     G4int fScintHCID = -1;
-=======
-    G4int fGapHCID = -1;
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
+
     G4int fCalorHCID = -1;  
 };
 

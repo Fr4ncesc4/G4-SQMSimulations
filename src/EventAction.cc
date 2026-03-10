@@ -63,28 +63,19 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
   // Get hits collections
   auto absoHC = GetHitsCollection(fAbsHCID, event);
-<<<<<<< HEAD
   auto scintHC = GetHitsCollection(fScintHCID, event);
-=======
-  auto gapHC = GetHitsCollection(fGapHCID, event);
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
+
   // Get Calorimeter hits collection ID (solo la prima volta)
   if (fCalorHCID == -1) {
     //fCalorHCID = G4SDManager::GetSDMpointer()->GetCollectionID("CalorimeterHitsCollection");
     fCalorHCID = G4SDManager::GetSDMpointer()
-<<<<<<< HEAD
+
                ->GetCollectionID("ScintHitsCollection");
                G4cout << "Calor HCID = " << fCalorHCID << G4endl;
     if (fCalorHCID == -1) {
     auto sdManager = G4SDManager::GetSDMpointer();
     fCalorHCID = sdManager->GetCollectionID("ScintHitsCollection");
-=======
-               ->GetCollectionID("CalorimeterSD/CalorimeterHitsCollection");
-               G4cout << "Calor HCID = " << fCalorHCID << G4endl;
-    if (fCalorHCID == -1) {
-    auto sdManager = G4SDManager::GetSDMpointer();
-    fCalorHCID = sdManager->GetCollectionID("CalorimeterSD/CalorimeterHitsCollection");
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
+
 }
 
 if (fCalorHCID < 0) {
@@ -98,11 +89,8 @@ if (fCalorHCID < 0) {
 auto calorHC = GetHitsCollection(fCalorHCID, event);
 G4double firstPhotonTime = -1.0; // inizializzazione
 
-<<<<<<< HEAD
 if (calorHC && calorHC->entries() > 0) {  
-=======
-if (calorHC && calorHC->entries() > 0) {  // <-- aggiungi questo controllo
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
+
     for (size_t i = 0; i < calorHC->entries(); ++i) {
         B4c::CalorHit* hit = (*calorHC)[i];
         G4double t = hit->GetFirstPhotonTime(); // usa il getter
@@ -117,11 +105,7 @@ if (calorHC && calorHC->entries() > 0) {  // <-- aggiungi questo controllo
 
   // Get hit with total values
   auto absoHit = (*absoHC)[absoHC->entries() - 1];
-<<<<<<< HEAD
   auto scintHit = (*scintHC)[scintHC->entries() - 1];
-=======
-  auto gapHit = (*gapHC)[gapHC->entries() - 1];
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
   G4int nPhotons = absoHit->GetPhotonCount();
 
   // Print per event (modulo n)
@@ -129,15 +113,8 @@ if (calorHC && calorHC->entries() > 0) {  // <-- aggiungi questo controllo
   auto eventID = event->GetEventID();
   auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
   if ((printModulo > 0) && (eventID % printModulo == 0)) {
-<<<<<<< HEAD
     PrintEventStatistics(absoHit->GetEdep(), absoHit->GetTrackLength(), scintHit->GetEdep(),
                          scintHit->GetTrackLength());
-=======
-    PrintEventStatistics(absoHit->GetEdep(), absoHit->GetTrackLength(), gapHit->GetEdep(),
-                         gapHit->GetTrackLength());
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
-
-
 
 
     G4cout << "--> End of event: " << eventID << "\n" << G4endl;
@@ -159,11 +136,7 @@ if (calorHC && calorHC->entries() > 0) {  // <-- aggiungi questo controllo
   analysisManager->FillNtupleDColumn(0, absoHit->GetEdep());
   analysisManager->FillNtupleDColumn(1, scintHit->GetEdep());
   analysisManager->FillNtupleDColumn(2, absoHit->GetTrackLength());
-<<<<<<< HEAD
   analysisManager->FillNtupleDColumn(3, scintHit->GetTrackLength());
-=======
-  analysisManager->FillNtupleDColumn(3, gapHit->GetTrackLength());
->>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
   analysisManager->FillNtupleIColumn(4, nPhotons);
   analysisManager->FillNtupleDColumn(5, firstPhotonTime); 
   analysisManager->AddNtupleRow();
