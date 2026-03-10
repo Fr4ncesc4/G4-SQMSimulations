@@ -36,17 +36,21 @@ RunAction::RunAction()
 
   // Creating histograms
   analysisManager->CreateH1("Eabs", "Edep in absorber", 110, 0., 330 * MeV);
-  analysisManager->CreateH1("Egap", "Edep in gap", 100, 0., 30 * MeV);
+  analysisManager->CreateH1("Escint", "Edep in scint", 100, 0., 30 * MeV);
   analysisManager->CreateH1("Labs", "trackL in absorber", 100, 0., 50 * cm);
-  analysisManager->CreateH1("Lgap", "trackL in gap", 100, 0., 50 * cm);
+  analysisManager->CreateH1("Lscint", "trackL in scint", 100, 0., 50 * cm);
 
   // Creating ntuple
   //
   analysisManager->CreateNtuple("B4", "Edep and TrackL");
   analysisManager->CreateNtupleDColumn("Eabs");
-  analysisManager->CreateNtupleDColumn("Egap");
+  analysisManager->CreateNtupleDColumn("Escint");
   analysisManager->CreateNtupleDColumn("Labs");
+<<<<<<< HEAD
+  analysisManager->CreateNtupleDColumn("Lscint");
+=======
   analysisManager->CreateNtupleDColumn("Lgap");
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
   analysisManager->CreateNtupleIColumn("NPhotons");
   analysisManager->CreateNtupleDColumn("t_first_photon");
   analysisManager->FinishNtuple();
@@ -92,13 +96,13 @@ void RunAction::EndOfRunAction(const G4Run* /*run*/)
     G4cout << " EAbs : mean = " << G4BestUnit(analysisManager->GetH1(0)->mean(), "Energy")
            << " rms = " << G4BestUnit(analysisManager->GetH1(0)->rms(), "Energy") << G4endl;
 
-    G4cout << " EGap : mean = " << G4BestUnit(analysisManager->GetH1(1)->mean(), "Energy")
+    G4cout << " EScint : mean = " << G4BestUnit(analysisManager->GetH1(1)->mean(), "Energy")
            << " rms = " << G4BestUnit(analysisManager->GetH1(1)->rms(), "Energy") << G4endl;
 
     G4cout << " LAbs : mean = " << G4BestUnit(analysisManager->GetH1(2)->mean(), "Length")
            << " rms = " << G4BestUnit(analysisManager->GetH1(2)->rms(), "Length") << G4endl;
 
-    G4cout << " LGap : mean = " << G4BestUnit(analysisManager->GetH1(3)->mean(), "Length")
+    G4cout << " LScint : mean = " << G4BestUnit(analysisManager->GetH1(3)->mean(), "Length")
            << " rms = " << G4BestUnit(analysisManager->GetH1(3)->rms(), "Length") << G4endl;
   }
 

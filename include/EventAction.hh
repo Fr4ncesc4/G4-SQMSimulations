@@ -18,7 +18,7 @@ namespace B4c
 /// Event action class
 ///
 /// In EndOfEventAction(), it prints the accumulated quantities of the energy
-/// deposit and track lengths of charged particles in Absober and Gap layers
+/// deposit and track lengths of charged particles in Absober and Scint layers
 /// stored in the hits collections.
 
 class EventAction : public G4UserEventAction
@@ -33,12 +33,16 @@ class EventAction : public G4UserEventAction
   private:
     // methods
     CalorHitsCollection* GetHitsCollection(G4int hcID, const G4Event* event) const;
-    void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength, G4double gapEdep,
-                              G4double gapTrackLength) const;
+    void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength, G4double scintEdep,
+                              G4double scintTrackLength) const;
 
     // data members
     G4int fAbsHCID = -1;
+<<<<<<< HEAD
+    G4int fScintHCID = -1;
+=======
     G4int fGapHCID = -1;
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
     G4int fCalorHCID = -1;  
 };
 

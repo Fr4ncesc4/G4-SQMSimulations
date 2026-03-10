@@ -5,8 +5,13 @@
 
 
 #include "CalorimeterSD.hh"
+<<<<<<< HEAD
+#include "G4Material.hh" 
+#include "G4NistManager.hh" 
+=======
 #include "G4Material.hh" //
 #include "G4NistManager.hh" //
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 #include "G4AutoDelete.hh"
 #include "G4Box.hh"
 #include "G4Colour.hh"
@@ -14,7 +19,11 @@
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4PVReplica.hh"
+<<<<<<< HEAD
+#include "G4PhysicalConstants.hh" 
+=======
 #include "G4PhysicalConstants.hh" //
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 #include "G4SDManager.hh"
 #include "G4SystemOfUnits.hh"//
 #include "G4VisAttributes.hh"
@@ -36,11 +45,18 @@ namespace B4c
 G4ThreadLocal
 G4GlobalMagFieldMessenger* DetectorConstruction::fMagFieldMessenger = nullptr;
  
+<<<<<<< HEAD
+G4VPhysicalVolume* DetectorConstruction::Construct() //PRIMO METODO PRINCIPALE, 
+                                                    //CHIAMA DEFINE MATERIALS E DEFINE VOLUMES,
+                                                   // quindi prima dici con cosa sono fatti, 
+                                                  //poi come, e poi posizioni i materiali
+=======
 
 
 
 
 G4VPhysicalVolume* DetectorConstruction::Construct()
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 {
   // Define materials
   DefineMaterials();
@@ -50,8 +66,18 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 }
 
 
-void DetectorConstruction::DefineMaterials()
+void DetectorConstruction::DefineMaterials() //Silicio,Mylar,EJ-208,Galactic
 {
+<<<<<<< HEAD
+
+// Silicon, Mylar
+  auto nistManager = G4NistManager::Instance();
+  nistManager->FindOrBuildMaterial("G4_Si");
+  nistManager->FindOrBuildMaterial("G4_MYLAR");
+
+// EJ-208 scintillation material  
+  
+=======
 
   
   // Lead 
@@ -64,6 +90,7 @@ void DetectorConstruction::DefineMaterials()
 
 // EJ-200   calorimeter scintillation material  added 01/12/14
   
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
  auto matEJ208 = nistManager->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
  matEJ208->GetIonisation()->SetBirksConstant(0.16*mm/MeV);
   
@@ -77,11 +104,20 @@ void DetectorConstruction::DefineMaterials()
   
   G4double EJ208_ABSL[EJ208num]  = { 380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm,380*cm};
 
+<<<<<<< HEAD
+//assegni al materiale EJ-208 una Material Properties Table (MPT) con spettroemiss,n,Labs,yeld,time
+//Creazione del materiale, è il contenitore dove G4 legge 
+=======
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
   auto MPTEJ208 = new G4MaterialPropertiesTable();
   MPTEJ208->AddProperty("SCINTILLATIONCOMPONENT1", EJ208_Energy, EJ208_SCINT, EJ208num);
   MPTEJ208->AddProperty("RINDEX",        EJ208_Energy, EJ208_RIND,  EJ208num);
   MPTEJ208->AddProperty("ABSLENGTH",     EJ208_Energy, EJ208_ABSL,  EJ208num);
+<<<<<<< HEAD
+  MPTEJ208->AddConstProperty("SCINTILLATIONYIELD",10574/MeV); 
+=======
   MPTEJ208->AddConstProperty("SCINTILLATIONYIELD",10574/MeV); // CHECK THE CORRECT NUMBER
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
   MPTEJ208->AddConstProperty("RESOLUTIONSCALE",1.0);
   MPTEJ208->AddConstProperty("SCINTILLATIONTIMECONSTANT1",2.1*ns);
   MPTEJ208->AddConstProperty("SCINTILLATIONTIMECONSTANT2",2.1*ns);
@@ -89,7 +125,11 @@ void DetectorConstruction::DefineMaterials()
   MPTEJ208->AddConstProperty("SCINTILLATIONRISETIME1",0.9*ns);
   matEJ208->SetMaterialPropertiesTable(MPTEJ208);
 
+<<<<<<< HEAD
+/// le proprietà che dip da energia: n, spettro di emissione, lunghezza di assorbimento     
+=======
 /// 
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 
 
 
@@ -109,6 +149,41 @@ void DetectorConstruction::DefineMaterials()
   mptGal->AddProperty("RINDEX", E, R, n);
   gal->SetMaterialPropertiesTable(mptGal);
   
+<<<<<<< HEAD
+// Optical grease / coupling layer
+G4double densityGrease = 1.0*g/cm3;
+auto grease = new G4Material("OpticalGrease", densityGrease, 2);
+grease->AddElement(nistManager->FindOrBuildElement("C"), 2);
+grease->AddElement(nistManager->FindOrBuildElement("H"), 2);
+
+const G4int nGrease = 2;
+G4double eGrease[nGrease]   = {2.0*eV, 3.5*eV};
+G4double rGrease[nGrease]   = {1.46, 1.46};
+G4double absGrease[nGrease] = {10.*cm, 10.*cm};
+
+auto mptGrease = new G4MaterialPropertiesTable();
+mptGrease->AddProperty("RINDEX",    eGrease, rGrease, nGrease);
+mptGrease->AddProperty("ABSLENGTH", eGrease, absGrease, nGrease);
+
+grease->SetMaterialPropertiesTable(mptGrease);
+
+ // Silicon (G4_Si) - optical properties for the SiPM
+auto si = G4Material::GetMaterial("G4_Si");
+
+const G4int nSi = 2;
+G4double eSi[nSi]   = {2.0*eV, 3.5*eV};
+G4double rSi[nSi]   = {3.8, 3.8};      // first approximation
+G4double absSi[nSi] = {1.*um, 1.*um};  // strong absorption in silicon
+
+auto mptSi = new G4MaterialPropertiesTable();
+mptSi->AddProperty("RINDEX",    eSi, rSi, nSi);
+mptSi->AddProperty("ABSLENGTH", eSi, absSi, nSi);
+
+si->SetMaterialPropertiesTable(mptSi);
+
+}
+//QUI COSTRUISCI mondo, wrappyng in mylar, scint, layer, gap e SiPM
+=======
 
 
 
@@ -121,11 +196,27 @@ void DetectorConstruction::DefineMaterials()
 
 }
 
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 {
-  // Geometry parameters
+  // Geometry parameters //scint = 10x1cm e 0.5 cm di spessore
   fNofLayers = 1;
   //G4double absoThickness = 10. * mm;
+<<<<<<< HEAD
+  //G4double gapThickness = 5. * mm;
+  G4double scintThickness = 5. * mm;
+  G4double calorSizeX = 10. * cm; 
+  G4double calorSizeY = 1. *cm; 
+
+
+  G4double mylarThick = 0.10*mm;
+  G4double airThick   = 0.10*mm;
+
+  //auto layerThickness = absoThickness + gapThickness;
+  //auto layerThickness = gapThickness;
+  auto layerThickness = scintThickness;
+
+=======
   G4double gapThickness = 5. * mm;
   G4double calorSizeX = 10. * cm; 
   G4double calorSizeY = 1. *cm; 
@@ -133,6 +224,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4double airThick   = 0.10*mm;
   //auto layerThickness = absoThickness + gapThickness;
   auto layerThickness = gapThickness;
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
   auto calorThickness = fNofLayers * layerThickness;
   //auto worldSizeXY = 30.0 * cm;
   //auto worldSizeZ  = 30.0 * cm;
@@ -140,18 +232,48 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto worldSizeZ  = 1.0 * m;
   //auto worldSizeXY = 1.2 * calorSizeXY;
   //auto worldSizeZ = 1.2 * calorThickness;
+<<<<<<< HEAD
+
+auto mylarOuterS = new G4Box("MylarOuter",
+                             calorSizeX/2 + mylarThick,
+                             calorSizeY/2 + mylarThick,
+                             calorThickness/2 + mylarThick);
+
+auto mylarInnerS = new G4Box("MylarInner",
+                             calorSizeX/2,
+                             calorSizeY/2,
+                             calorThickness/2);
+
+// guscio sottile: box esterno - box interno
+auto mylarShellS = new G4SubtractionSolid("MylarShell",
+                                          mylarOuterS,
+                                          mylarInnerS);
+
+// finestra per il SiPM
+=======
  auto mylarFullS = new G4Box("MylarWrap_full",
                             calorSizeX/2 + mylarThick,
                             calorSizeY/2 + mylarThick,
                             calorThickness/2 + mylarThick);
 
 
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 G4double winY = 4.0*mm;
 G4double winZ = 4.0*mm;
 G4double winX = 2.0*mm;
 
 auto winS = new G4Box("MylarWindow", winX/2, winY/2, winZ/2);
 
+<<<<<<< HEAD
+// finestra centrata sulla faccia +X del guscio
+G4ThreeVector winPos((calorSizeX/2 + mylarThick) - winX/2, 0.0, 0.0);
+
+auto mylarWrapS = new G4SubtractionSolid("MylarWrap",
+                                         mylarShellS,
+                                         winS,
+                                         nullptr,
+                                         winPos);
+=======
 // Posizione del buco: centrato sulla faccia +X del Mylar
 G4ThreeVector winPos( (calorSizeX/2 + mylarThick) - winX/2, 0.0, 0.0 );
 
@@ -160,6 +282,7 @@ auto mylarWrapS = new G4SubtractionSolid("MylarWrap",
                                         winS,
                                         nullptr,
                                         winPos);
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 
 
 
@@ -167,12 +290,23 @@ auto mylarWrapS = new G4SubtractionSolid("MylarWrap",
   // GET MATERIALS
   auto defaultMaterial = G4Material::GetMaterial("Galactic");
   //auto absorberMaterial = defaultMaterial; // Assorbitore = vuoto, galactic
+<<<<<<< HEAD
+  //auto gapMaterial = G4Material::GetMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
+  auto scintMaterial = G4Material::GetMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
+  //auto defaultMaterial = gapMaterial;
+  auto mylarMat = G4Material::GetMaterial("G4_MYLAR");
+  auto sipmMaterial = G4Material::GetMaterial("G4_Si");
+  auto greaseMaterial = G4Material::GetMaterial("OpticalGrease");
+  
+  if (!scintMaterial|| !sipmMaterial|| !mylarMat|| !greaseMaterial) {
+=======
   auto gapMaterial = G4Material::GetMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
   //auto defaultMaterial = gapMaterial;
   auto mylarMat = G4Material::GetMaterial("G4_MYLAR");
   auto sipmMaterial = G4Material::GetMaterial("G4_Si");
   
   if (!gapMaterial|| !sipmMaterial|| !mylarMat) {
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
     G4ExceptionDescription msg;
     msg << "Cannot retrieve materials already defined.";
     G4Exception("DetectorConstruction::DefineVolumes()", "MyCode0001", FatalException, msg);
@@ -218,7 +352,11 @@ auto mylarWrapS = new G4SubtractionSolid("MylarWrap",
                   fCheckOverlaps);
 
   // Optical surface: reflective Mylar
+<<<<<<< HEAD
+
+=======
 // -----------------------------
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 auto mylarSurf = new G4OpticalSurface("MylarSurface");
 mylarSurf->SetType(dielectric_metal);
 mylarSurf->SetModel(unified);
@@ -238,13 +376,17 @@ mylarSurf->SetMaterialPropertiesTable(mylarMPT);
 new G4LogicalSkinSurface("MylarSkinSurface", mylarWrapLV, mylarSurf);
 
   //
-  // Calorimeter
+  // Calorimeter = Scintillator
   //
   auto calorimeterS = new G4Box("Calorimeter",  // its name
                                 calorSizeX / 2, calorSizeY / 2, calorThickness / 2);  // its size
 
   auto calorLV = new G4LogicalVolume(calorimeterS,  // its solid
+<<<<<<< HEAD
+                                     scintMaterial,//defaultMaterial,  // its material
+=======
                                      gapMaterial,//defaultMaterial,  // its material
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
                                      "Calorimeter");  // its name
 
   new G4PVPlacement(nullptr,  // no rotation
@@ -263,7 +405,11 @@ new G4LogicalSkinSurface("MylarSkinSurface", mylarWrapLV, mylarSurf);
                           calorSizeX / 2, calorSizeY / 2, layerThickness / 2);  // its size
 
   auto layerLV = new G4LogicalVolume(layerS,  // its solid
+<<<<<<< HEAD
+                                     scintMaterial,//defaultMaterial,  // its material
+=======
                                      gapMaterial,//defaultMaterial,  // its material
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
                                      "Layer");  // its name
 
   new G4PVReplica("Layer",  // its name
@@ -294,24 +440,62 @@ new G4LogicalSkinSurface("MylarSkinSurface", mylarWrapLV, mylarSurf);
     
 */
   //
-  // Gap
+  // Scint
   //
+<<<<<<< HEAD
+  auto scintS = new G4Box("Scint",  // its name
+                        calorSizeX / 2, calorSizeY / 2, scintThickness / 2);  // its size
+=======
   auto gapS = new G4Box("Gap",  // its name
                         calorSizeX / 2, calorSizeY / 2, gapThickness / 2);  // its size
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 
-  auto gapLV = new G4LogicalVolume(gapS,  // its solid
-                                   gapMaterial,  // its material
-                                   "GapLV");  // its name
+  auto scintLV = new G4LogicalVolume(scintS,  // its solid
+                                   scintMaterial,  // its material
+                                   "ScintLV");  // its name
 
   new G4PVPlacement(nullptr,  // no rotation
                     G4ThreeVector(0., 0., 0.),  // its position // al posto del terzo 0 c'era absoThickness / 2
+<<<<<<< HEAD
+                    scintLV,  // its logical volume
+                    "Scint",  // its name
+=======
                     gapLV,  // its logical volume
                     "Gap",  // its name
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
                     layerLV,  // its mother  volume
                     false,  // no boolean operation
                     0,  // copy number
                     fCheckOverlaps);  // checking overlaps
 
+<<<<<<< HEAD
+//
+// Optical grease between scintillator and SiPM
+//
+G4double greaseThick = 0.05 * mm;
+G4double greaseX = greaseThick;
+G4double greaseY = 3.0 * mm;
+G4double greaseZ = 3.0 * mm;
+
+auto greaseS = new G4Box("Grease", greaseX/2, greaseY/2, greaseZ/2);
+
+auto greaseLV = new G4LogicalVolume(greaseS,
+                                    greaseMaterial,
+                                    "GreaseLV");
+
+G4double greasePosX = calorSizeX/2 + mylarThick + greaseX/2;
+
+new G4PVPlacement(nullptr,
+                  G4ThreeVector(greasePosX, 0.0, 0.0),
+                  greaseLV,
+                  "Grease",
+                  worldLV,
+                  false,
+                  0,
+                  fCheckOverlaps);
+
+=======
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
   
   //
 // SiPM
@@ -342,7 +526,12 @@ new G4PVPlacement(nullptr,
 G4double margine = 0.1 * mm ; 
 auto rotY = new G4RotationMatrix();
 rotY->rotateY(90.*deg);
+<<<<<<< HEAD
+
+G4double sipmPosX = calorSizeX/2 + mylarThick + greaseThick + sipmZ/2 + margine;
+=======
 G4double sipmPosX = calorSizeX/2 + sipmZ/2;
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 new G4PVPlacement(rotY,//nullptr,
                   G4ThreeVector(sipmPosX, 0.0, 0.0),
                   //G4ThreeVector(calorSizeX/2 + sipmZ/2 + margine,0.0, 0.0), //(calorSizeX/2 + sipmY/2,0.0,sipmZ/2)
@@ -353,6 +542,35 @@ new G4PVPlacement(rotY,//nullptr,
                   0,
                   fCheckOverlaps);
 
+<<<<<<< HEAD
+
+
+// Simple SiPM optical detection surface 
+auto sipmSurf = new G4OpticalSurface("SiPMSurface");
+sipmSurf->SetType(dielectric_metal);
+sipmSurf->SetModel(unified);
+sipmSurf->SetFinish(polished);
+
+const G4int nSipmSurf = 2;
+G4double eSipmSurf[nSipmSurf]    = {2.0*eV, 3.5*eV};
+G4double reflSipm[nSipmSurf]     = {0.0, 0.0};
+G4double effSipm[nSipmSurf]      = {0.25, 0.25};  // first average PDE approximation
+
+auto sipmSurfMPT = new G4MaterialPropertiesTable();
+sipmSurfMPT->AddProperty("REFLECTIVITY", eSipmSurf, reflSipm, nSipmSurf);
+sipmSurfMPT->AddProperty("EFFICIENCY",   eSipmSurf, effSipm,  nSipmSurf);
+
+sipmSurf->SetMaterialPropertiesTable(sipmSurfMPT);
+
+new G4LogicalSkinSurface("SiPMSkinSurface", sipmLV, sipmSurf);
+
+// Visualizzazione rossa
+auto sipmVis = new G4VisAttributes(G4Colour(1.,0.,0.));
+sipmLV->SetVisAttributes(sipmVis);
+// Visualizzazione verde 
+auto greaseVis = new G4VisAttributes(G4Colour(0.,1.,0.));
+greaseLV->SetVisAttributes(greaseVis);
+=======
 // Visualizzazione rossa
 auto sipmVis = new G4VisAttributes(G4Colour(1.,0.,0.));
 sipmLV->SetVisAttributes(sipmVis);
@@ -360,6 +578,7 @@ sipmLV->SetVisAttributes(sipmVis);
 
 
 
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
 /*
   //
   // print parameters
@@ -375,8 +594,13 @@ sipmLV->SetVisAttributes(sipmVis);
   // print parameters
   //
   G4cout << G4endl << "------------------------------------------------------------" << G4endl
+<<<<<<< HEAD
+         << "---> The calorimeter is " << fNofLayers << " layers of: [ "<< scintThickness / mm << "mm of "
+         << scintMaterial->GetName() << " ] " << G4endl
+=======
          << "---> The calorimeter is " << fNofLayers << " layers of: [ "<< gapThickness / mm << "mm of "
          << gapMaterial->GetName() << " ] " << G4endl
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
          << "------------------------------------------------------------" << G4endl;
 
 
@@ -407,10 +631,22 @@ void DetectorConstruction::ConstructSDandField()
  // auto absoSD = new CalorimeterSD("AbsorberSD", "AbsorberHitsCollection", fNofLayers);
   //G4SDManager::GetSDMpointer()->AddNewDetector(absoSD);
   //SetSensitiveDetector("AbsoLV", absoSD);
+<<<<<<< HEAD
 
-  auto gapSD = new CalorimeterSD("GapSD", "GapHitsCollection", fNofLayers);
-  G4SDManager::GetSDMpointer()->AddNewDetector(gapSD);
-  SetSensitiveDetector("GapLV", gapSD);
+
+//DetectorConstruction crea o registra per esempio CalorimeterSD e lo associa a uno o più LogicalVolume.
+
+
+  auto scintSD = new CalorimeterSD("ScintSD", "ScintHitsCollection", fNofLayers);
+  G4SDManager::GetSDMpointer()->AddNewDetector(scintSD);
+  SetSensitiveDetector("ScintLV", scintSD);
+
+  auto sipmSD = new CalorimeterSD("SiPMSD", "AbsorberHitsCollection", 1);
+  G4SDManager::GetSDMpointer()->AddNewDetector(sipmSD);
+  SetSensitiveDetector("SiPMLV", sipmSD);
+=======
+>>>>>>> 5023a29109d4a16b2107d6e65afab103f44cd077
+
 
   auto sipmSD = new CalorimeterSD("SiPMSD", "AbsorberHitsCollection", 1);
   G4SDManager::GetSDMpointer()->AddNewDetector(sipmSD);

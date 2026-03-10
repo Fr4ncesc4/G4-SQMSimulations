@@ -1,5 +1,6 @@
 /// \file CalorHit.cc
 /// \brief Implementation of the B4c::CalorHit class
+//immagazzina l'informazione fisica raccolta nel detector sensibile, inserisce gli oggetti che ha in una Hitscollection
 
 #include "CalorHit.hh"
 
